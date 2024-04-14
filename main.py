@@ -1,7 +1,7 @@
 #Failas, atsakingas už darbą su vartotojo input'u ir gamestate objekto pavaizdavimą
 
 import pygame
-from engine import GameState
+from engine import *
 
 pygame.init()
 WIDTH = HEIGHT = 512
@@ -46,11 +46,35 @@ def main():
     gs = GameState()
     loadImages()
     running = True
-    
+    #Sekamas paskutinis naudotojo paspaudimas (row, col koordinatės)
+    usedSquare = ()
+    #Sekama iš kur į kur naudotojas nori atlikti ėjimą
+    mouseClicks = []
     while running:
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
+            #Pelės paspaudimų valdymas
+            elif e.type == pygame.MOUSEBUTTONDOWN:
+                #pelės x, y koordinatės 2D grafike
+                location = pygame.mouse.get_pos()
+                #row ir col nustato kuris langelis yra paspaudžiamas, taip žinosime, kuri figūra naudojama
+                col = location[0]//SQ_SIZE
+                row = location[1]//SQ_SIZE
+                #Tikrinam ar naudotojas du kartus spaudžia ant to paties langelio
+                if usedSquare == (row, col):
+                    usedSquare = ()
+                    mouseClicks = []
+                else:
+                    usedSquare = (row, col)
+                    mouseClicks.append(usedSquare)
+                #Jei naudotojas paspaudė du kartus, atliekamas ėjimas
+                if len(mouseClicks) == 2:
+                    move = Move(mouseClicks[0], mouseClicks[1], gs.board)
+                    gs.makeMove(move)
+                    print(move.getChessNotation())
+                    usedSquare = ()
+                    mouseClicks = []
         drawGameState(screen, gs)        
         clock.tick(MAX_FPS)
         pygame.display.flip()
