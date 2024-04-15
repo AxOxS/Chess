@@ -44,6 +44,8 @@ def main():
     clock = pygame.time.Clock()
     screen.fill(pygame.Color("black"))
     gs = GameState()
+    validMoves = gs.getAllValidMoves()
+    moveMade = False
     loadImages()
     running = True
     #Sekamas paskutinis naudotojo paspaudimas (row, col koordinatės)
@@ -71,10 +73,23 @@ def main():
                 #Jei naudotojas paspaudė du kartus, atliekamas ėjimas
                 if len(mouseClicks) == 2:
                     move = Move(mouseClicks[0], mouseClicks[1], gs.board)
-                    gs.makeMove(move)
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
                     print(move.getChessNotation())
                     usedSquare = ()
                     mouseClicks = []
+            #Klavišų paspaudimų valdymas
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_BACKSPACE:
+                    gs.undo()
+                    moveMade = True
+                    print(gs.moveLog)
+                    
+        if moveMade:
+            validMoves = gs.getAllValidMoves()
+            moveMade = False
+        
         drawGameState(screen, gs)        
         clock.tick(MAX_FPS)
         pygame.display.flip()
