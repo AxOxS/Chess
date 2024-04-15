@@ -31,6 +31,7 @@ class GameState():
             move = self.moveLog.pop()
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not self.whiteToMove
     
     def movePawn(self, i, j, moves):
         if self.whiteToMove:  # White pawn moves
@@ -51,6 +52,7 @@ class GameState():
                 moves.append(Move((i, j), (i+1, j-1), self.board))
             if j+1 <= 7 and self.board[i+1][j+1][0] == "w":  # Capture to the right
                 moves.append(Move((i, j), (i+1, j+1), self.board))
+                
     def moveRook(self, i, j, moves):
         pass
     def moveKnight(self, i, j, moves):

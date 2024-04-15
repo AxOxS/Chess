@@ -76,7 +76,7 @@ def main():
                     if move in validMoves:
                         gs.makeMove(move)
                         moveMade = True
-                    print(move.getChessNotation())
+                        print(move.getChessNotation())
                     usedSquare = ()
                     mouseClicks = []
             #Klavišų paspaudimų valdymas
