@@ -15,6 +15,7 @@ class GameState():
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
         
+        self.moveFunctions = {"P": self.movePawn, "R": self.moveRook, "N": self.moveKnight, "B": self.moveBishop, "Q": self.moveQueen, "K": self.moveKing}
         self.whiteToMove = True
         self.moveLog = []
     
@@ -64,20 +65,20 @@ class GameState():
     def moveKing(self, i, j, moves):
         pass
             
-    def moveFunctions(self, i, j, moves):
-        piece = self.board[i][j][1]
-        if piece == "P":
-            self.movePawn(i, j, moves)
-        elif piece == "R":
-            self.moveRook(i, j, moves)
-        elif piece == "N":
-            self.moveKnight(i, j, moves)
-        elif piece == "B":
-            self.moveBishop(i, j, moves)
-        elif piece == "Q":
-            self.moveQueen(i, j, moves)
-        elif piece == "K":
-            self.moveKing(i, j, moves)
+    # def moveFunctions(self, i, j, moves):
+    #     piece = self.board[i][j][1]
+    #     if piece == "P":
+    #         self.movePawn(i, j, moves)
+    #     elif piece == "R":
+    #         self.moveRook(i, j, moves)
+    #     elif piece == "N":
+    #         self.moveKnight(i, j, moves)
+    #     elif piece == "B":
+    #         self.moveBishop(i, j, moves)
+    #     elif piece == "Q":
+    #         self.moveQueen(i, j, moves)
+    #     elif piece == "K":
+    #         self.moveKing(i, j, moves)
     
     def getAllValidMoves(self):
         return self.getAllPossibleMoves()
@@ -88,7 +89,9 @@ class GameState():
             for j in range(len(self.board[i])):
                 playerTurn = self.board[i][j][0]
                 if (playerTurn == "w" and self.whiteToMove) or (playerTurn == "b" and not self.whiteToMove):
-                    self.moveFunctions(i, j, moves)
+                    # self.moveFunctions(i, j, moves)
+                    piece = self.board[i][j][1]
+                    self.moveFunctions[piece](i, j, moves)
         return moves
 
 class Move():
