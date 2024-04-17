@@ -55,15 +55,60 @@ class GameState():
                 moves.append(Move((i, j), (i+1, j+1), self.board))
                 
     def moveRook(self, i, j, moves):
-        pass
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
+        for d in directions:
+            for step in range(1, 8):
+                endRow = i + d[0]*step
+                endCol = j + d[1]*step
+                if 0 <= endRow < 8 and 0 <= endCol < 8:
+                    endPiece = self.board[endRow][endCol]
+                    if endPiece == "--":
+                        moves.append(Move((i, j), (endRow, endCol), self.board))
+                    elif endPiece[0] != self.board[i][j][0]:
+                        moves.append(Move((i, j), (endRow, endCol), self.board))
+                        break
+                    else:
+                        break
+        
     def moveKnight(self, i, j, moves):
-        pass
+        knightMoves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
+        for m in knightMoves:
+            endRow = i + m[0]
+            endCol = j + m[1]
+            if 0 <= endRow < 8 and 0 <= endCol < 8:
+                endPiece = self.board[endRow][endCol]
+                if endPiece == "--" or endPiece[0] != self.board[i][j][0]:
+                    moves.append(Move((i, j), (endRow, endCol), self.board))
+        
     def moveBishop(self, i, j, moves):
-        pass
+        directions = ((-1, -1), (-1, 1), (1, -1), (1, 1))
+        for d in directions:
+            for step in range(1, 8):
+                endRow = i + d[0]*step
+                endCol = j + d[1]*step
+                if 0 <= endRow < 8 and 0 <= endCol < 8:
+                    endPiece = self.board[endRow][endCol]
+                    if endPiece == "--":
+                        moves.append(Move((i, j), (endRow, endCol), self.board))
+                    elif endPiece[0] != self.board[i][j][0]:
+                        moves.append(Move((i, j), (endRow, endCol), self.board))
+                        break
+                    else:
+                        break
+    
     def moveQueen(self, i, j, moves):
-        pass
+        self.moveRook(i, j, moves)
+        self.moveBishop(i, j, moves)
+
     def moveKing(self, i, j, moves):
-        pass
+        directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+        for d in directions:
+            endRow = i + d[0]
+            endCol = j + d[1]
+            if 0 <= endRow < 8 and 0 <= endCol < 8:
+                endPiece = self.board[endRow][endCol]
+                if endPiece == "--" or endPiece[0] != self.board[i][j][0]:
+                    moves.append(Move((i, j), (endRow, endCol), self.board))
             
     # def moveFunctions(self, i, j, moves):
     #     piece = self.board[i][j][1]
