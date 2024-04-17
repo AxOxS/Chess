@@ -49,7 +49,7 @@ class GameState():
                 moves.append(Move((i, j), (i+1, j), self.board))
             if i == 1 and self.board[i+2][j] == "--":  # Move two squares forward from starting position
                 moves.append(Move((i, j), (i+2, j), self.board))
-            if j-1 >= 0 and self.board[i+1][j-1][0] == "w":  # Capture to the left
+            if j-1 >= 0 and self.board[i+1][j-1][0] == "w":  # Capture to the left 
                 moves.append(Move((i, j), (i+1, j-1), self.board))
             if j+1 <= 7 and self.board[i+1][j+1][0] == "w":  # Capture to the right
                 moves.append(Move((i, j), (i+1, j+1), self.board))

@@ -77,8 +77,10 @@ def main():
                         gs.makeMove(move)
                         moveMade = True
                         print(move.getChessNotation())
-                    usedSquare = ()
-                    mouseClicks = []
+                        usedSquare = ()
+                        mouseClicks = []
+                    else:
+                        mouseClicks = [usedSquare]
             #Klavišų paspaudimų valdymas
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_BACKSPACE:
