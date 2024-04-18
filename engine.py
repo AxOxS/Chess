@@ -18,6 +18,11 @@ class GameState():
         self.moveFunctions = {"P": self.movePawn, "R": self.moveRook, "N": self.moveKnight, "B": self.moveBishop, "Q": self.moveQueen, "K": self.moveKing}
         self.whiteToMove = True
         self.moveLog = []
+        self.whiteKing = (7, 4)
+        self.blackKing = (0, 4)
+        self.checkMate = False
+        self.staleMate = False
+
     
     #metodas, atsakingas už ėjimų atlikimą
     def makeMove(self, move):
@@ -25,6 +30,10 @@ class GameState():
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)
         self.whiteToMove = not self.whiteToMove
+        if move.pieceMoved == "wK":
+            self.whiteKing = (move.endRow, move.endCol)
+        if move.pieceMoved == "bK":
+            self.blackKing = (move.endRow, move.endCol)
         
     #Metodas, kuris atšaukia naujausią padarytą ėjimą
     def undo(self):
@@ -33,6 +42,10 @@ class GameState():
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
+            if move.pieceMoved == "wK":
+                self.whiteKing = (move.startRow, move.startCol)
+            if move.pieceMoved == "bK":
+                self.blackKing = (move.startRow, move.startCol)
     
     def movePawn(self, i, j, moves):
         if self.whiteToMove:  # White pawn moves
@@ -125,8 +138,41 @@ class GameState():
     #     elif piece == "K":
     #         self.moveKing(i, j, moves)
     
+    def squareUnderAttack(self, i, j):
+        self.whiteToMove = not self.whiteToMove
+        oppMoves = self.getAllPossibleMoves()
+        self.whiteToMove = not self.whiteToMove
+        for move in oppMoves:
+            if move.endRow == i and move.endCol == j:
+                return True
+        return False
+    
+    def inCheck(self):
+        kingRow, kingCol = self.whiteKing if self.whiteToMove else self.blackKing
+        
+        return self.squareUnderAttack(kingRow, kingCol)
+     
     def getAllValidMoves(self):
-        return self.getAllPossibleMoves()
+        moves = self.getAllPossibleMoves()
+        validMoves = []
+        for move in moves:
+            self.makeMove(move)
+            self.whiteToMove = not self.whiteToMove
+            if not self.inCheck():
+                validMoves.append(move)
+            self.whiteToMove = not self.whiteToMove
+            self.undo()
+            
+        if len(validMoves) == 0:
+            if self.inCheck():
+                self.checkMate = True
+            else:
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False
+                
+        return validMoves
     
     def getAllPossibleMoves(self):
         moves = []
