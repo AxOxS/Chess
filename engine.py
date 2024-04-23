@@ -22,6 +22,7 @@ class GameState():
         self.blackKing = (0, 4)
         self.checkMate = False
         self.staleMate = False
+        self.enpassantPossible = ()
 
     
     #metodas, atsakingas už ėjimų atlikimą
@@ -38,6 +39,15 @@ class GameState():
         #Pawn promotion
         if move.isPawnPromotion:
             self.board[move.endRow][move.endCol] = move.pieceMoved[0] + "Q"
+            
+        #En passant
+        if move.isEnpassantMove:
+            self.board[move.startRow][move.endCol] = "--"
+            
+        if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
+            self.enpassantPossible = ((move.startRow + move.endRow)//2, move.startCol)
+        else:
+            self.enpassantPossible = ()
         
     #Metodas, kuris atšaukia naujausią padarytą ėjimą
     def undo(self):
@@ -50,26 +60,40 @@ class GameState():
                 self.whiteKing = (move.startRow, move.startCol)
             if move.pieceMoved == "bK":
                 self.blackKing = (move.startRow, move.startCol)
+            if move.isEnpassantMove:
+                self.board[move.endRow][move.endCol] = "--"
+                self.board[move.startRow][move.endCol] = move.pieceCaptured
+                self.enpassantPossible = (move.endRow, move.endCol)
+            if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
+                self.enpassantPossible = ()
     
     def movePawn(self, i, j, moves):
-        if self.whiteToMove:  # White pawn moves
-            if self.board[i-1][j] == "--":  # Move one square forward
-                moves.append(Move((i, j), (i-1, j), self.board))
-            if i == 6 and self.board[i-2][j] == "--":  # Move two squares forward from starting position
-                moves.append(Move((i, j), (i-2, j), self.board))
-            if j-1 >= 0 and self.board[i-1][j-1][0] == "b":  # Capture to the left
-                moves.append(Move((i, j), (i-1, j-1), self.board))
-            if j+1 <= 7 and self.board[i-1][j+1][0] == "b":  # Capture to the right
-                moves.append(Move((i, j), (i-1, j+1), self.board))
-        else:  # Black pawn moves
-            if self.board[i+1][j] == "--":  # Move one square forward
-                moves.append(Move((i, j), (i+1, j), self.board))
-            if i == 1 and self.board[i+2][j] == "--":  # Move two squares forward from starting position
-                moves.append(Move((i, j), (i+2, j), self.board))
-            if j-1 >= 0 and self.board[i+1][j-1][0] == "w":  # Capture to the left 
-                moves.append(Move((i, j), (i+1, j-1), self.board))
-            if j+1 <= 7 and self.board[i+1][j+1][0] == "w":  # Capture to the right
-                moves.append(Move((i, j), (i+1, j+1), self.board))
+        direction = -1 if self.whiteToMove else 1
+        start_row = 6 if self.whiteToMove else 1
+        opponent_color = "b" if self.whiteToMove else "w"
+        
+        # Move one square forward
+        if self.board[i + direction][j] == "--":
+            moves.append(Move((i, j), (i + direction, j), self.board))
+            # Move two squares forward from starting position
+            if i == start_row and self.board[i + 2*direction][j] == "--":
+                moves.append(Move((i, j), (i + 2*direction, j), self.board))
+        
+        # Capture to the left
+        if j-1 >= 0 and self.board[i + direction][j - 1][0] == opponent_color:
+            moves.append(Move((i, j), (i + direction, j - 1), self.board))
+        
+        # Capture to the right
+        if j+1 <= 7 and self.board[i + direction][j + 1][0] == opponent_color:
+            moves.append(Move((i, j), (i + direction, j + 1), self.board))
+        
+        # En passant
+        if i == 3 if self.whiteToMove else 4:
+            if j-1 >= 0 and self.board[i][j - 1] == opponent_color + "P" and self.board[i + direction][j - 1] == "--" and self.board[i + 2*direction][j - 1] == "--":
+                moves.append(Move((i, j), (i + direction, j - 1), self.board, enpassantPossible=True))
+            if j+1 <= 7 and self.board[i][j + 1] == opponent_color + "P" and self.board[i + direction][j + 1] == "--" and self.board[i + 2*direction][j + 1] == "--":
+                moves.append(Move((i, j), (i + direction, j + 1), self.board, enpassantPossible=True))
+
                 
     def moveRook(self, i, j, moves):
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
@@ -157,6 +181,7 @@ class GameState():
         return self.squareUnderAttack(kingRow, kingCol)
      
     def getAllValidMoves(self):
+        tempEnpassantPossible = self.enpassantPossible
         moves = self.getAllPossibleMoves()
         validMoves = []
         for move in moves:
@@ -175,7 +200,8 @@ class GameState():
         else:
             self.checkMate = False
             self.staleMate = False
-                
+        
+        self.enpassantPossible = tempEnpassantPossible    
         return validMoves
     
     def getAllPossibleMoves(self):
@@ -197,7 +223,7 @@ class Move():
     filesToCols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
     colsToFiles = {v: k for k, v in filesToCols.items()}
     
-    def __init__(self, startSq, endSq, board):
+    def __init__(self, startSq, endSq, board, enpassantPossible = False):
         self.startRow = startSq[0]
         self.startCol = startSq[1]
         self.endRow = endSq[0]
@@ -205,10 +231,10 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol
-        self.isPawnPromotion = False
-        if (self.pieceMoved == "wP" and self.endRow == 0) or (self.pieceMoved == "bP" and self.endRow == 7):
-            self.isPawnPromotion = True
-        
+        self.isPawnPromotion = (self.pieceMoved == "wP" and self.endRow == 0) or (self.pieceMoved == "bP" and self.endRow == 7)
+        self.isEnpassantMove = enpassantPossible
+        if self.isEnpassantMove:
+            self.pieceCaptured = "wP" if self.pieceMoved == "bP" else "bP"
     
     #Overriding the equals method
     def __eq__(self, other):
