@@ -208,6 +208,7 @@ class Move():
         self.isPawnPromotion = False
         if (self.pieceMoved == "wP" and self.endRow == 0) or (self.pieceMoved == "bP" and self.endRow == 7):
             self.isPawnPromotion = True
+        
     
     #Overriding the equals method
     def __eq__(self, other):
