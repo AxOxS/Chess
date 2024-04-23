@@ -27,7 +27,7 @@ def drawBoard(screen):
 
 #Naudojant lentos 2D masyvą iš GameState klasės, pavaizduojamos figūros šachmatų lentoje            
 def drawPieces(screen, board):
-    for i in range(DIMENSION):
+    for i in range(DIMENSION): 
         for j in range(DIMENSION):
             piece = board[i][j]
             if piece != "--":
@@ -73,13 +73,14 @@ def main():
                 #Jei naudotojas paspaudė du kartus, atliekamas ėjimas
                 if len(mouseClicks) == 2:
                     move = Move(mouseClicks[0], mouseClicks[1], gs.board)
-                    if move in validMoves:
-                        gs.makeMove(move)
-                        moveMade = True
-                        print(move.getChessNotation())
-                        usedSquare = ()
-                        mouseClicks = []
-                    else:
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:
+                            gs.makeMove(validMoves[i])
+                            moveMade = True
+                            print(move.getChessNotation())
+                            usedSquare = ()
+                            mouseClicks = []
+                    if not moveMade:
                         mouseClicks = [usedSquare]
             #Klavišų paspaudimų valdymas
             elif e.type == pygame.KEYDOWN:

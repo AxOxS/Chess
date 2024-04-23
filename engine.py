@@ -34,6 +34,10 @@ class GameState():
             self.whiteKing = (move.endRow, move.endCol)
         if move.pieceMoved == "bK":
             self.blackKing = (move.endRow, move.endCol)
+            
+        #Pawn promotion
+        if move.isPawnPromotion:
+            self.board[move.endRow][move.endCol] = move.pieceMoved[0] + "Q"
         
     #Metodas, kuris atšaukia naujausią padarytą ėjimą
     def undo(self):
@@ -201,6 +205,9 @@ class Move():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol
+        self.isPawnPromotion = False
+        if (self.pieceMoved == "wP" and self.endRow == 0) or (self.pieceMoved == "bP" and self.endRow == 7):
+            self.isPawnPromotion = True
     
     #Overriding the equals method
     def __eq__(self, other):
