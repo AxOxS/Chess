@@ -104,18 +104,18 @@ class GameState():
         elif move.pieceMoved == "bK":
             self.currentCastlingRight.bks = False
             self.currentCastlingRight.bqs = False
-        elif move.pieceMoved == "wR":
-            if move.startRow == 7:
-                if move.startCol == 0:
-                    self.currentCastlingRight.wqs = False 
-                elif move.startCol == 7:
-                    self.currentCastlingRight.wks = False
-        elif move.pieceMoved == "bR":
-            if move.startRow == 0:
-                if move.startCol == 0:
+        elif move.pieceMoved in ["wR", "bR"]:
+            if move.startCol == 0:
+                if move.pieceMoved == "wR" and move.startRow == 7:
+                    self.currentCastlingRight.wqs = False
+                elif move.pieceMoved == "bR" and move.startRow == 0:
                     self.currentCastlingRight.bqs = False
-                elif move.startCol == 7:
+            elif move.startCol == 7:
+                if move.pieceMoved == "wR" and move.startRow == 7:
+                    self.currentCastlingRight.wks = False
+                elif move.pieceMoved == "bR" and move.startRow == 0:
                     self.currentCastlingRight.bks = False
+
     
     def movePawn(self, i, j, moves):
         direction = -1 if self.whiteToMove else 1
