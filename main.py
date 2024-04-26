@@ -2,6 +2,7 @@
 
 import pygame
 from engine import *
+from chessBot import *
 
 pygame.init()
 WIDTH = HEIGHT = 512
@@ -100,14 +101,19 @@ def main():
     #Sekama iš kur į kur naudotojas nori atlikti ėjimą
     mouseClicks = []
     gameOver = False
+    playerOne = False #Jei žaidžia žmogus, playerOne = True, jei žaidžia kompiuteris, playerOne = False
+    playerTwo = False #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
     
     while running:
+        
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
+        
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 running = False
             #Pelės paspaudimų valdymas
             elif e.type == pygame.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     #pelės x, y koordinatės 2D grafike
                     location = pygame.mouse.get_pos()
                     #row ir col nustato kuris langelis yra paspaudžiamas, taip žinosime, kuri figūra naudojama
@@ -146,6 +152,15 @@ def main():
                     moveMade = False
                     animate = False
                     gameOver = False
+                    
+        #Boto logika
+        if not gameOver and not humanTurn:
+            BotMove = findRandMove(validMoves)
+            if BotMove is None:
+                BotMove = findRandMove(validMoves)
+            gs.makeMove(BotMove)
+            moveMade = True
+            animate = True
                     
         if moveMade:
             if animate:
