@@ -155,7 +155,8 @@ def main():
                     
         #Boto logika
         if not gameOver and not humanTurn:
-            BotMove = findRandMove(validMoves)
+            BotMove = findBestMove(gs, validMoves)
+            #BotMove = findRandMove(validMoves)
             if BotMove is None:
                 BotMove = findRandMove(validMoves)
             gs.makeMove(BotMove)
