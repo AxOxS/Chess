@@ -4,7 +4,6 @@ import pygame
 from engine import *
 from chessBot import *
 
-pygame.init()
 WIDTH = HEIGHT = 512
 DIMENSION = 8 #Šachmatų lenta yra 8x8 dydžio
 SQ_SIZE = HEIGHT // DIMENSION
@@ -65,6 +64,9 @@ def animateMove(move, screen, gs, clock):
         endSquare = pygame.Rect(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE, SQ_SIZE, SQ_SIZE)
         pygame.draw.rect(screen, color, endSquare)
         if move.pieceCaptured != "--":
+            if move.isEnpassantMove:
+                enPassantRow = move.endRow + 1 if move.pieceCaptured[0] == "b" else move.endRow - 1
+                endSquare = pygame.Rect(move.endCol*SQ_SIZE, enPassantRow*SQ_SIZE, SQ_SIZE, SQ_SIZE)
             screen.blit(IMAGES[move.pieceCaptured], endSquare)
         screen.blit(IMAGES[move.pieceMoved], pygame.Rect(col*SQ_SIZE, row*SQ_SIZE, SQ_SIZE, SQ_SIZE))
         pygame.display.flip()
@@ -78,6 +80,8 @@ def drawText(screen, text):
     textObject = font.render(text, 0, pygame.Color("Gray"))
     screen.blit(textObject, textLocation.move(2, 2))    
 
+
+
 #Funkcija, atsakinga už šachmatų lentos pavaizdavimą         
 def drawGameState(screen, gs, validMoves, usedSquare):
     drawBoard(screen)
@@ -87,6 +91,7 @@ def drawGameState(screen, gs, validMoves, usedSquare):
         
 #Main funkcija, atsakinga už vartotojo input'ą ir grafinį pavaizdavimą
 def main():
+    pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     screen.fill(pygame.Color("black"))
@@ -101,7 +106,7 @@ def main():
     #Sekama iš kur į kur naudotojas nori atlikti ėjimą
     mouseClicks = []
     gameOver = False
-    playerOne = False #Jei žaidžia žmogus, playerOne = True, jei žaidžia kompiuteris, playerOne = False
+    playerOne = True #Jei žaidžia žmogus, playerOne = True, jei žaidžia kompiuteris, playerOne = False
     playerTwo = False #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
     
     while running:
@@ -145,6 +150,7 @@ def main():
                     gs.undo()
                     moveMade = True
                     animate = False
+                    gameOver = False
                     print(gs.moveLog)
                 if e.key == pygame.K_r:
                     gs = GameState()

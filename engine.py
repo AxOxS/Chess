@@ -96,6 +96,9 @@ class GameState():
                 else:
                     self.board[move.endRow][move.endCol-2] = self.board[move.endRow][move.endCol+1]
                     self.board[move.endRow][move.endCol+1] = "--"
+            
+            self.checkMate = False
+            self.staleMate = False
     
     def updateCastleRights(self, move):
         if move.pieceMoved == "wK":
@@ -114,6 +117,19 @@ class GameState():
                 if move.pieceMoved == "wR" and move.startRow == 7:
                     self.currentCastlingRight.wks = False
                 elif move.pieceMoved == "bR" and move.startRow == 0:
+                    self.currentCastlingRight.bks = False
+        
+        if move.pieceCaptured == "wR":
+            if move.endRow == 7:
+                if move.endCol == 0:
+                    self.currentCastlingRight.wqs = False
+                elif move.endCol == 7:
+                    self.currentCastlingRight.wks = False
+        elif move.pieceCaptured == "bR":
+            if move.endRow == 0:
+                if move.endCol == 0:
+                    self.currentCastlingRight.bqs = False
+                elif move.endCol == 7:
                     self.currentCastlingRight.bks = False
 
     
@@ -235,8 +251,8 @@ class GameState():
         return self.squareUnderAttack(kingRow, kingCol)
      
     def getAllValidMoves(self):
-        for log in self.castleRightsLog:
-            print(log.wks, log.bks, log.wqs, log.bqs, end=", ")
+        # for log in self.castleRightsLog:
+        #     print(log.wks, log.bks, log.wqs, log.bqs, end=", ")
         tempEnpassantPossible = self.enpassantPossible
         tempCastleRights = CastleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks, self.currentCastlingRight.wqs, self.currentCastlingRight.bqs)
         

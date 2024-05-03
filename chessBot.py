@@ -4,7 +4,7 @@ import random
 rating = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "P": 1}
 checkMate = 1000
 staleMate = 0
-
+DEPTH = 2
 
 def findRandMove(validMoves):
     return validMoves[random.randint(0, len(validMoves) - 1)]
@@ -29,60 +29,33 @@ def scoreBoard(gs):
 
     return score
 
-
 def findBestMove(gs, validMoves):
-    turnMultiplier = 1 if gs.whiteToMove else -1
-    oppMinMax = checkMate
-    bestMove = None
+    global nextMove, counter
+    nextMove = None
+    random.shuffle(validMoves)
+    counter = 0
+    findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -checkMate, checkMate, 1 if gs.whiteToMove else -1)
+    print(counter)
+    return nextMove
+
+def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier):
+    global nextMove, counter
+    counter += 1
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
     
-    for playerMove in validMoves:
-        gs.makeMove(playerMove)
-        opponentMoves = gs.getAllValidMoves()
-        random.shuffle(validMoves)
-        oppMax = -checkMate
-        for opponentMove in opponentMoves:
-            gs.makeMove(opponentMove)
-            if gs.checkMate:
-                score = -turnMultiplier * checkMate
-            elif gs.staleMate:
-                score = staleMate
-            else:
-                score = -turnMultiplier * scoreBoard(gs)
-            
-            if score > oppMax:
-                oppMax = score
-            gs.undo()
-        if oppMax < oppMinMax:
-            oppMinMax = oppMax
-            bestMove = playerMove
+    maxScore = -checkMate
+    for move in validMoves:
+        gs.makeMove(move)
+        nextMoves = gs.getAllValidMoves()
+        score = -findMoveNegaMaxAlphaBeta(gs, nextMoves, depth-1, -beta, -alpha, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
         gs.undo()
-    return bestMove
-
-# def findBestMove(gs, validMoves):
-#     bestScore = float('-inf') if gs.whiteToMove else float('inf')
-#     bestMove = None
-
-#     for playerMove in validMoves:
-#         gs.makeMove(playerMove)
-#         opponentMoves = gs.getAllValidMoves()
-
-#         if gs.checkMate:
-#             score = -1000 if gs.whiteToMove else 1000
-#         elif gs.staleMate:
-#             score = 0
-#         else:
-#             _, score = findBestMove(gs, opponentMoves)
-#             score = -score
-
-#         gs.undo()
-
-#         if gs.whiteToMove:
-#             if score > bestScore:
-#                 bestScore = score
-#                 bestMove = playerMove
-#         else:
-#             if score < bestScore:
-#                 bestScore = score
-#                 bestMove = playerMove
-
-#     return bestMove, bestScore
+        if maxScore > alpha:
+            alpha = maxScore
+        if alpha >= beta:
+            break
+    return maxScore
