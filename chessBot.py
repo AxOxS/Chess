@@ -4,7 +4,7 @@ import random
 rating = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "P": 1}
 checkMate = 1000
 staleMate = 0
-DEPTH = 2
+DEPTH = 3
 
 def findRandMove(validMoves):
     return validMoves[random.randint(0, len(validMoves) - 1)]

@@ -5,6 +5,8 @@ from engine import *
 from chessBot import *
 
 WIDTH = HEIGHT = 512
+MOVE_LOG_PANEL_WIDTH = 250
+MOVE_LOG_PANEL_HEIGHT = HEIGHT
 DIMENSION = 8 #Šachmatų lenta yra 8x8 dydžio
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15
@@ -72,7 +74,7 @@ def animateMove(move, screen, gs, clock):
         pygame.display.flip()
         clock.tick(60)
 
-def drawText(screen, text):
+def drawEndText(screen, text):
     font = pygame.font.SysFont("Arial", 32, True, False)
     textObject = font.render(text, 0, pygame.Color("Black"))
     textLocation = pygame.Rect(0, 0, WIDTH, HEIGHT).move(WIDTH//2 - textObject.get_width()//2, HEIGHT//2 - textObject.get_height()//2)
@@ -80,19 +82,44 @@ def drawText(screen, text):
     textObject = font.render(text, 0, pygame.Color("Gray"))
     screen.blit(textObject, textLocation.move(2, 2))    
 
-
+def drawMoveLog(screen, gs, font):
+    moveLogRect = pygame.Rect(WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    pygame.draw.rect(screen, pygame.Color("black"), moveLogRect)
+    moveLog = gs.moveLog
+    moveText = []
+    for i in range(0, len(moveLog), 2):
+        moveString = str(i//2 + 1) + ". " + str(moveLog[i]) + " "
+        if i + 1 < len(moveLog):
+            moveString += str(moveLog[i + 1])
+        moveText.append(moveString)
+        
+    movesPerRow = 3
+    padding = 5
+    lineSpacing = 2
+    textY = padding
+    for i in range(0, len(moveText), movesPerRow):
+        text = ""
+        for j in range(movesPerRow):
+            if i + j < len(moveText):
+                text += "  " + moveText[i + j]
+        textObject = font.render(text, True, pygame.Color("White"))
+        textLocation = moveLogRect.move(padding, textY)
+        screen.blit(textObject, textLocation)
+        textY += textObject.get_height() + lineSpacing
 
 #Funkcija, atsakinga už šachmatų lentos pavaizdavimą         
-def drawGameState(screen, gs, validMoves, usedSquare):
+def drawGameState(screen, gs, validMoves, usedSquare, moveLogFont):
     drawBoard(screen)
     highlightSquares(screen, gs, validMoves, usedSquare)
     drawPieces(screen, gs.board)
+    drawMoveLog(screen, gs, moveLogFont)
     
         
 #Main funkcija, atsakinga už vartotojo input'ą ir grafinį pavaizdavimą
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    moveLogFont = pygame.font.SysFont("Arial", 14, False, False)
+    screen = pygame.display.set_mode((WIDTH + MOVE_LOG_PANEL_WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     screen.fill(pygame.Color("black"))
     gs = GameState()
@@ -107,7 +134,7 @@ def main():
     mouseClicks = []
     gameOver = False
     playerOne = True #Jei žaidžia žmogus, playerOne = True, jei žaidžia kompiuteris, playerOne = False
-    playerTwo = False #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
+    playerTwo = True #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
     
     while running:
         
@@ -125,7 +152,7 @@ def main():
                     col = location[0]//SQ_SIZE
                     row = location[1]//SQ_SIZE
                     #Tikrinam ar naudotojas du kartus spaudžia ant to paties langelio
-                    if usedSquare == (row, col):
+                    if usedSquare == (row, col) or col >= 8:
                         usedSquare = ()
                         mouseClicks = []
                     else:
@@ -176,17 +203,12 @@ def main():
             moveMade = False
             animate = False
         
-        drawGameState(screen, gs, validMoves, usedSquare) 
+        drawGameState(screen, gs, validMoves, usedSquare, moveLogFont) 
         
-        if gs.checkMate:
+        if gs.checkMate or gs.staleMate:
             gameOver = True
-            if gs.whiteToMove:
-                drawText(screen, "Black wins by checkmate")
-            else:
-                drawText(screen, "White wins by checkmate")
-        elif gs.staleMate:
-            gameOver = True
-            drawText(screen, "Stalemate")
+            text = "Stalemate" if gs.staleMate else "Black wins by checkmate" if gs.whiteToMove else "White wins by checkmate"
+            drawEndText(screen, text)
                
         clock.tick(MAX_FPS)
         pygame.display.flip()

@@ -331,6 +331,25 @@ class Move():
     def getRankFile(self, row, col):
         return self.colsToFiles[col] + self.rowsToRanks[row]
     
+    #Overriding the string method
+    def __str__(self):
+        #Castle move
+        if self.isCastleMove:
+            return "O-O" if self.endCol == 6 else "O-O-O"
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+        #Pawn moves
+        if self.pieceMoved[1] == "P":
+            if self.pieceCaptured != "--":
+                return self.colsToFiles[self.startCol] + "x" + endSquare
+            else:
+                return endSquare
+            
+        #Other pieces
+        moveString = self.pieceMoved[1]
+        if self.pieceCaptured != "--":
+            moveString += "x"
+        return moveString + endSquare
+    
 class CastleRights():
     def __init__(self, wks, bks, wqs, bqs):
         self.wks = wks
