@@ -299,7 +299,7 @@ class GameState():
 
 class Move():
     #Ši klasė atsakinga už ėjimų saugojimą ir tikrinimą
-    #Ši klasė saugo informaciją apie ėjimą, ėjimo koordinates ir figūrą, kurią ėjimas atliekamas
+    #Ši klasė saugo informaciją apie ėjimą, ėjimo koordinates ir figūrą, kuria ėjimas atliekamas
     ranksToRows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}
     rowsToRanks = {v: k for k, v in ranksToRows.items()}
     filesToCols = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
