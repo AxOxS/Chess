@@ -61,7 +61,7 @@ pieceScores = {"Q": Queens, "R": Rooks, "B": Bishops, "N": Knights, "wP": whiteP
 
 checkMate = 1000
 staleMate = 0
-DEPTH = 1
+DEPTH = 2
 
 def findRandMove(validMoves):
     return validMoves[random.randint(0, len(validMoves) - 1)]

@@ -151,8 +151,8 @@ def main():
     #Sekama iš kur į kur naudotojas nori atlikti ėjimą
     mouseClicks = []
     gameOver = False
-    playerOne = False #Jei žaidžia žmogus, playerOne = True, jei žaidžia kompiuteris, playerOne = False
-    playerTwo = False #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
+    playerOne = True #Jei žaidžia žmogus, playerOne = True, jei žaidžia kompiuteris, playerOne = False
+    playerTwo = True #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
     BotThinking = False #Jei botas galvoja, BotThinking = True, jei ne, BotThinking = False
     moveFinder = None #Kintamasis, kuris bus naudojamas kaip procesas, kuris ieškos geriausio ėjimo
     moveUndone = False #Kintamasis, kuris nurodo ar ėjimas buvo atšauktas
