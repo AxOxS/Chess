@@ -152,7 +152,7 @@ def main():
     mouseClicks = []
     gameOver = False
     playerOne = True #Jei žaidžia žmogus, playerOne = True, jei žaidžia kompiuteris, playerOne = False
-    playerTwo = True #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
+    playerTwo = False #Jei žaidžia žmogus, playerTwo = True, jei žaidžia kompiuteris, playerTwo = False
     BotThinking = False #Jei botas galvoja, BotThinking = True, jei ne, BotThinking = False
     moveFinder = None #Kintamasis, kuris bus naudojamas kaip procesas, kuris ieškos geriausio ėjimo
     moveUndone = False #Kintamasis, kuris nurodo ar ėjimas buvo atšauktas
@@ -251,6 +251,7 @@ def main():
             drawEndText(screen, text)
                
         clock.tick(MAX_FPS)
+        #Arnaujinta informacija iš buferio perkeliama į ekraną
         pygame.display.flip()
 
 
